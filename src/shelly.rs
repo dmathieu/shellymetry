@@ -6,12 +6,10 @@ pub struct Shelly {
     pub uptime: u64,
 }
 
-impl Shelly {
-    pub async fn load(url: String) -> Result<Shelly, Box<dyn std::error::Error>> {
-        let resp = Client::new().get(url).send().await?;
-        let shelly = resp.json::<Shelly>().await?;
-        Ok(shelly)
-    }
+pub async fn load(url: String) -> Result<Shelly, Box<dyn std::error::Error>> {
+    let resp = Client::new().get(url).send().await?;
+    let shelly = resp.json::<Shelly>().await?;
+    Ok(shelly)
 }
 
 #[cfg(test)]
@@ -29,9 +27,7 @@ mod tests {
                 .respond_with(status_code(200).body(content)),
         );
 
-        let shelly = Shelly::load(server.url("/shelly").to_string())
-            .await
-            .unwrap();
+        let shelly = load(server.url("/shelly").to_string()).await.unwrap();
         assert_eq!(343771, shelly.uptime);
     }
 }
