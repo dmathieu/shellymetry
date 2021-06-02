@@ -878,6 +878,7 @@ name = "shellymetry"
 version = "0.1.0"
 dependencies = [
  "httptest",
+ "hyper",
  "reqwest",
  "serde",
  "serde_json",
