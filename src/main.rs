@@ -11,5 +11,6 @@ const LOCALHOST: IpAddr = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     let addr = SocketAddr::new(LOCALHOST, 1304);
-    server::build(addr).start().await
+    let exporter = opentelemetry_prometheus::exporter().init();
+    server::build(addr, exporter).start().await
 }
