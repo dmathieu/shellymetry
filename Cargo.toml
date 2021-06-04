@@ -7,15 +7,15 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-reqwest = { version = "0.11.3", features = ["json"] }
-tokio = { version = "1.5.0", features = ["full"] }
-hyper = { version = "0.14", features = ["full"] }
-prometheus = "0.12"
-opentelemetry-prometheus = "0.7.0"
 clap = "3.0.0-beta.2"
 config = "0.11"
+hyper = { version = "0.14", features = ["full"] }
+opentelemetry-prometheus = "0.7.0"
+prometheus = "0.12"
+reqwest = { version = "0.11.3", features = ["json"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.5.0", features = ["full"] }
 
 [dev-dependencies]
 httptest = "0.15.2"
