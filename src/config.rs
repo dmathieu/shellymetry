@@ -1,4 +1,5 @@
 use config;
+use opentelemetry::KeyValue;
 use serde::Deserialize;
 use std::collections::HashMap;
 
@@ -17,6 +18,15 @@ impl Device {
             self.name.to_uppercase()
         )
         .to_string()
+    }
+
+    pub fn kv_labels(&self) -> Vec<KeyValue> {
+        let mut kv = Vec::new();
+        for (k, v) in self.labels.iter() {
+            kv.push(KeyValue::new(k.to_string(), v.to_string()));
+        }
+
+        kv
     }
 }
 
@@ -56,7 +66,7 @@ mod tests {
     }
 
     #[test]
-    fn test_device() {
+    fn test_device_url() {
         let device = Device {
             kind: "plug".to_string(),
             name: "foobar".to_string(),
@@ -67,5 +77,20 @@ mod tests {
             "http://shellyplug-FOOBAR.local/status".to_string(),
             device.url()
         )
+    }
+
+    #[test]
+    fn test_device_kv_labels() {
+        let mut labels = HashMap::new();
+        labels.insert("room".to_string(), "bedroom".to_string());
+        let device = Device {
+            kind: "plug".to_string(),
+            name: "foobar".to_string(),
+            labels: labels,
+        };
+
+        let mut kv = Vec::new();
+        kv.push(KeyValue::new("room", "bedroom"));
+        assert_eq!(kv, device.kv_labels());
     }
 }

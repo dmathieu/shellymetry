@@ -33,6 +33,6 @@ async fn update_devices(config: &config::Config) {
     for device in config.devices.iter() {
         println!("Loading data for {}", device.name);
         let data = shelly::load(device.url()).await.unwrap();
-        uptime.record(data.uptime, &[]);
+        uptime.record(data.uptime, &device.kv_labels());
     }
 }
