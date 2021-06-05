@@ -1,3 +1,12 @@
 {
-	"server_port": 1304
+	"server_port": 1304,
+	"devices": [
+		{
+			"kind": "plug",
+			"name": "ABCDEF",
+			"labels": {
+				"room": "bedroom"
+			}
+		}
+	]
 }
