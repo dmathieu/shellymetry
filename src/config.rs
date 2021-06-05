@@ -9,6 +9,17 @@ pub struct Device {
     pub labels: HashMap<String, String>,
 }
 
+impl Device {
+    pub fn url(&self) -> String {
+        format!(
+            "http://shelly{}-{}.local/status",
+            self.kind,
+            self.name.to_uppercase()
+        )
+        .to_string()
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct Config {
     pub server_port: u16,
@@ -42,5 +53,19 @@ mod tests {
             }],
             config.devices
         );
+    }
+
+    #[test]
+    fn test_device() {
+        let device = Device {
+            kind: "plug".to_string(),
+            name: "foobar".to_string(),
+            labels: HashMap::new(),
+        };
+
+        assert_eq!(
+            "http://shellyplug-FOOBAR.local/status".to_string(),
+            device.url()
+        )
     }
 }
