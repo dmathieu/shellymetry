@@ -1,5 +1,6 @@
 {
 	"server_port": 1304,
+	"refresh_interval": 15,
 	"devices": [
 		{
 			"kind": "plug",

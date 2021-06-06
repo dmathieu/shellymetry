@@ -22,7 +22,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let addr = SocketAddr::new(LOCALHOST, config.server_port);
     let s = server::build(addr, exporter);
 
-    match try_join!(runner::run(&config), s.start()) {
+    match try_join!(runner::run(config), s.start()) {
         Ok((_, _)) => {
             // Everything went all right
         }

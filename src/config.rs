@@ -33,6 +33,7 @@ impl Device {
 #[derive(Debug, Deserialize)]
 pub struct Config {
     pub server_port: u16,
+    pub refresh_interval: u64,
     pub devices: Vec<Device>,
 }
 
