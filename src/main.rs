@@ -2,6 +2,7 @@ use std::{
     error::Error,
     net::{IpAddr, Ipv4Addr, SocketAddr},
 };
+use tokio::try_join;
 
 mod config;
 mod flags;
@@ -18,21 +19,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let flags = flags::build();
     let config = config::build(flags.config).unwrap();
 
-    match runner::run(&config).await {
-        Ok(()) => {
-            // Everything went all right
-        }
-        Err(err) => {
-            println!("runner failed: {}", err);
-        }
-    }
     let addr = SocketAddr::new(LOCALHOST, config.server_port);
-    match server::build(addr, exporter).start().await {
-        Ok(()) => {
+    let s = server::build(addr, exporter);
+
+    match try_join!(runner::run(&config), s.start()) {
+        Ok((_, _)) => {
             // Everything went all right
         }
         Err(err) => {
-            println!("server failed: {}", err);
+            println!("failure: {}", err);
         }
     }
 
