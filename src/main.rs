@@ -1,4 +1,3 @@
-use opentelemetry::global;
 use std::{
     error::Error,
     net::{IpAddr, Ipv4Addr, SocketAddr},
@@ -6,33 +5,36 @@ use std::{
 
 mod config;
 mod flags;
+mod runner;
 mod server;
 mod shelly;
 
 const LOCALHOST: IpAddr = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+async fn main() -> Result<(), Box<dyn Error>> {
     let exporter = opentelemetry_prometheus::exporter().init();
 
     let flags = flags::build();
     let config = config::build(flags.config).unwrap();
 
-    update_devices(&config).await;
-    let addr = SocketAddr::new(LOCALHOST, config.server_port);
-    server::build(addr, exporter).start().await
-}
-
-async fn update_devices(config: &config::Config) {
-    let meter = global::meter("shellymetry");
-    let uptime = meter
-        .u64_value_recorder("shelly_device_uptime")
-        .with_description("The device's uptime in seconds.")
-        .init();
-
-    for device in config.devices.iter() {
-        println!("Loading data for {}", device.name);
-        let data = shelly::load(device.url()).await.unwrap();
-        uptime.record(data.uptime, &device.kv_labels());
+    match runner::run(&config).await {
+        Ok(()) => {
+            // Everything went all right
+        }
+        Err(err) => {
+            println!("runner failed: {}", err);
+        }
     }
+    let addr = SocketAddr::new(LOCALHOST, config.server_port);
+    match server::build(addr, exporter).start().await {
+        Ok(()) => {
+            // Everything went all right
+        }
+        Err(err) => {
+            println!("server failed: {}", err);
+        }
+    }
+
+    Ok(())
 }
