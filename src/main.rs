@@ -1,4 +1,8 @@
-use opentelemetry::{global::shutdown_tracer_provider, sdk::export::trace::stdout};
+use opentelemetry::{
+    global::shutdown_tracer_provider,
+    sdk::{export::trace::stdout, trace::Tracer},
+};
+use opentelemetry_prometheus::PrometheusExporter;
 use std::{
     error::Error,
     net::{IpAddr, Ipv4Addr, SocketAddr},
@@ -15,10 +19,7 @@ const LOCALHOST: IpAddr = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let exporter = opentelemetry_prometheus::exporter().init();
-    let _tracer = stdout::new_pipeline()
-        .with_pretty_print(true)
-        .install_simple();
+    let (exporter, _tracer) = init_telemetry().unwrap();
 
     let flags = flags::build();
     let config = config::build(flags.config).unwrap();
@@ -37,4 +38,13 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     shutdown_tracer_provider();
     Ok(())
+}
+
+fn init_telemetry() -> Result<(PrometheusExporter, Tracer), Box<dyn Error>> {
+    let exporter = opentelemetry_prometheus::exporter().init();
+    let tracer = stdout::new_pipeline()
+        .with_pretty_print(true)
+        .install_simple();
+
+    Ok((exporter, tracer))
 }
