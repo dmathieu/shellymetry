@@ -9,6 +9,10 @@ pub async fn run(config: config::Config) -> Result<(), Box<dyn Error + Send + Sy
         .u64_value_recorder("shelly_device_uptime")
         .with_description("The device's uptime in seconds.")
         .init();
+    let power = meter
+        .f64_value_recorder("shelly_device_power")
+        .with_description("The device's current voltage.")
+        .init();
 
     task::spawn(async move {
         let mut interval = time::interval(Duration::from_secs(config.refresh_interval));
@@ -23,6 +27,7 @@ pub async fn run(config: config::Config) -> Result<(), Box<dyn Error + Send + Sy
                             .in_span("runner.tick.update", |_cx| async {
                                 let data = shelly::load(device.url()).await.unwrap();
                                 uptime.record(data.uptime, &device.kv_labels());
+                                power.record(data.meters[0].power, &device.kv_labels());
                             })
                             .await;
                     }

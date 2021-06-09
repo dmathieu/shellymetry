@@ -9,8 +9,14 @@ use serde::Deserialize;
 const URL_KEY: Key = Key::from_static_str("url");
 
 #[derive(Debug, Deserialize)]
+pub struct Meters {
+    pub power: f64,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Shelly {
     pub uptime: u64,
+    pub meters: Vec<Meters>,
 }
 
 pub async fn load(url: String) -> Result<Shelly, Box<dyn std::error::Error>> {
@@ -39,5 +45,6 @@ mod tests {
 
         let shelly = load(server.url("/shelly").to_string()).await.unwrap();
         assert_eq!(343771, shelly.uptime);
+        assert_eq!(88.44, shelly.meters[0].power);
     }
 }
