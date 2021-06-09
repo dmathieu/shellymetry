@@ -14,6 +14,23 @@ pub async fn run(config: config::Config) -> Result<(), Box<dyn Error + Send + Sy
         .with_description("The device's current voltage.")
         .init();
 
+    let ram_total = meter
+        .u64_value_recorder("shelly_device_ram_total")
+        .with_description("The device's total ram.")
+        .init();
+    let ram_free = meter
+        .u64_value_recorder("shelly_device_ram_free")
+        .with_description("The device's free ram.")
+        .init();
+    let fs_size = meter
+        .u64_value_recorder("shelly_device_fs_size")
+        .with_description("The device's total fs.")
+        .init();
+    let fs_free = meter
+        .u64_value_recorder("shelly_device_fs_free")
+        .with_description("The device's free fs.")
+        .init();
+
     task::spawn(async move {
         let mut interval = time::interval(Duration::from_secs(config.refresh_interval));
         let tracer = global::tracer("shellymetry");
@@ -28,6 +45,11 @@ pub async fn run(config: config::Config) -> Result<(), Box<dyn Error + Send + Sy
                                 let data = shelly::load(device.url()).await.unwrap();
                                 uptime.record(data.uptime, &device.kv_labels());
                                 power.record(data.meters[0].power, &device.kv_labels());
+
+                                ram_total.record(data.ram_total, &device.kv_labels());
+                                ram_free.record(data.ram_free, &device.kv_labels());
+                                fs_size.record(data.fs_size, &device.kv_labels());
+                                fs_free.record(data.fs_free, &device.kv_labels());
                             })
                             .await;
                     }

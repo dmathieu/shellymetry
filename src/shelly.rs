@@ -17,6 +17,11 @@ pub struct Meters {
 pub struct Shelly {
     pub uptime: u64,
     pub meters: Vec<Meters>,
+
+    pub ram_total: u64,
+    pub ram_free: u64,
+    pub fs_size: u64,
+    pub fs_free: u64,
 }
 
 pub async fn load(url: String) -> Result<Shelly, Box<dyn std::error::Error>> {
@@ -46,5 +51,9 @@ mod tests {
         let shelly = load(server.url("/shelly").to_string()).await.unwrap();
         assert_eq!(343771, shelly.uptime);
         assert_eq!(88.44, shelly.meters[0].power);
+        assert_eq!(50616, shelly.ram_total);
+        assert_eq!(38840, shelly.ram_free);
+        assert_eq!(233681, shelly.fs_size);
+        assert_eq!(164907, shelly.fs_free);
     }
 }
