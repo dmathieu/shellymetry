@@ -15,7 +15,7 @@ mod runner;
 mod server;
 mod shelly;
 
-const LOCALHOST: IpAddr = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
+const LOCALHOST: IpAddr = IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0));
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
