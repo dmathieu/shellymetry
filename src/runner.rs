@@ -42,14 +42,18 @@ pub async fn run(config: config::Config) -> Result<(), Box<dyn Error + Send + Sy
                     for device in config.devices.iter() {
                         tracer
                             .in_span("runner.tick.update", |_cx| async {
-                                let data = shelly::load(device.url()).await.unwrap();
-                                uptime.record(data.uptime, &device.kv_labels());
-                                power.record(data.meters[0].power, &device.kv_labels());
+                                match shelly::load(device.url()).await {
+                                    Ok(data) => {
+                                        uptime.record(data.uptime, &device.kv_labels());
+                                        power.record(data.meters[0].power, &device.kv_labels());
 
-                                ram_total.record(data.ram_total, &device.kv_labels());
-                                ram_free.record(data.ram_free, &device.kv_labels());
-                                fs_size.record(data.fs_size, &device.kv_labels());
-                                fs_free.record(data.fs_free, &device.kv_labels());
+                                        ram_total.record(data.ram_total, &device.kv_labels());
+                                        ram_free.record(data.ram_free, &device.kv_labels());
+                                        fs_size.record(data.fs_size, &device.kv_labels());
+                                        fs_free.record(data.fs_free, &device.kv_labels());
+                                    }
+                                    Err(err) => println!("{}", err),
+                                };
                             })
                             .await;
                     }
