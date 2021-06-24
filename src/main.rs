@@ -53,7 +53,7 @@ fn init_telemetry(config: &config::Config) -> Result<(PrometheusExporter, Tracer
             .with_http()
             .with_http_client(reqwest::Client::new())
             .with_headers(headers)
-            .install_simple()?,
+            .install_batch(opentelemetry::runtime::Tokio)?,
         None => stdout::new_pipeline()
             .with_pretty_print(true)
             .install_simple(),
