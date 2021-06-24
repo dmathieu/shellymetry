@@ -11,6 +11,7 @@ clap = "3.0.0-beta.2"
 config = "0.11"
 hyper = { version = "0.14", features = ["full"] }
 opentelemetry = { version = "0.15", features = ["rt-tokio", "metrics", "trace"] }
+opentelemetry-otlp = { version = "0.8", features = ["http-proto", "reqwest-client"] }
 opentelemetry-prometheus = "0.8.0"
 prometheus = "0.12"
 reqwest = { version = "0.11.3", features = ["json"] }

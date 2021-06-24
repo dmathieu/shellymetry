@@ -35,6 +35,9 @@ pub struct Config {
     pub server_port: u16,
     pub refresh_interval: u64,
     pub devices: Vec<Device>,
+
+    pub otlp_endpoint: Option<String>,
+    pub otlp_headers: Option<HashMap<String, String>>,
 }
 
 pub fn build(config_path: String) -> Result<Config, config::ConfigError> {

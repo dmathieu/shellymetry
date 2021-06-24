@@ -4,6 +4,7 @@ use opentelemetry::{
 };
 use opentelemetry_prometheus::PrometheusExporter;
 use std::{
+    collections::HashMap,
     error::Error,
     net::{IpAddr, Ipv4Addr, SocketAddr},
 };
@@ -19,10 +20,9 @@ const LOCALHOST: IpAddr = IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0));
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    let (exporter, _tracer) = init_telemetry().unwrap();
-
     let flags = flags::build();
     let config = config::build(flags.config).unwrap();
+    let (exporter, _tracer) = init_telemetry(&config).unwrap();
 
     let addr = SocketAddr::new(LOCALHOST, config.server_port);
     let s = server::build(addr, exporter);
@@ -40,11 +40,24 @@ async fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn init_telemetry() -> Result<(PrometheusExporter, Tracer), Box<dyn Error>> {
+fn init_telemetry(config: &config::Config) -> Result<(PrometheusExporter, Tracer), Box<dyn Error>> {
     let exporter = opentelemetry_prometheus::exporter().init();
-    let tracer = stdout::new_pipeline()
-        .with_pretty_print(true)
-        .install_simple();
+
+    let headers: HashMap<String, String> = match &config.otlp_headers {
+        Some(h) => h.clone(),
+        None => HashMap::new(),
+    };
+    let tracer: Tracer = match &config.otlp_endpoint {
+        Some(endpoint) => opentelemetry_otlp::new_pipeline()
+            .with_endpoint(endpoint.to_string())
+            .with_http()
+            .with_http_client(reqwest::Client::new())
+            .with_headers(headers)
+            .install_simple()?,
+        None => stdout::new_pipeline()
+            .with_pretty_print(true)
+            .install_simple(),
+    };
 
     Ok((exporter, tracer))
 }
