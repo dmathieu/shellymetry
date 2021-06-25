@@ -1,7 +1,7 @@
 use opentelemetry::{
     global,
     trace::{Span, Tracer},
-    Key,
+    Context, Key,
 };
 use reqwest::Client;
 use serde::Deserialize;
@@ -24,8 +24,8 @@ pub struct Shelly {
     pub fs_free: u64,
 }
 
-pub async fn load(url: String) -> Result<Shelly, Box<dyn std::error::Error>> {
-    let mut span = global::tracer("shellymetry").start("shelly.load");
+pub async fn load(cx: Context, url: String) -> Result<Shelly, Box<dyn std::error::Error>> {
+    let mut span = global::tracer("shellymetry").start_with_context("shelly.load", cx);
     span.set_attribute(URL_KEY.string(url.clone()));
 
     let resp = Client::new().get(url).send().await?;
