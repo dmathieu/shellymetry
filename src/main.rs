@@ -50,8 +50,8 @@ fn init_telemetry(config: &config::Config) -> Result<(PrometheusExporter, Tracer
     let tracer: Tracer = match &config.otlp_endpoint {
         Some(endpoint) => opentelemetry_otlp::new_pipeline()
             .with_endpoint(endpoint.to_string())
-            .with_http()
-            .with_http_client(reqwest::Client::new())
+            .with_grpcio()
+            .with_tls(true)
             .with_headers(headers)
             .install_batch(opentelemetry::runtime::Tokio)?,
         None => stdout::new_pipeline()
