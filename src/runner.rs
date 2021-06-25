@@ -1,5 +1,8 @@
 use crate::{config, shelly};
-use opentelemetry::{global, trace::Tracer};
+use opentelemetry::{
+    global,
+    trace::{Span, Tracer},
+};
 use std::{error::Error, time::Duration};
 use tokio::{task, time};
 
@@ -40,22 +43,20 @@ pub async fn run(config: config::Config) -> Result<(), Box<dyn Error + Send + Sy
             tracer
                 .in_span("runner.tick", |_cx| async {
                     for device in config.devices.iter() {
-                        tracer
-                            .in_span("runner.tick.update", |_cx| async {
-                                match shelly::load(device.url()).await {
-                                    Ok(data) => {
-                                        uptime.record(data.uptime, &device.kv_labels());
-                                        power.record(data.meters[0].power, &device.kv_labels());
+                        let mut span = tracer.start("runner.tick.update");
 
-                                        ram_total.record(data.ram_total, &device.kv_labels());
-                                        ram_free.record(data.ram_free, &device.kv_labels());
-                                        fs_size.record(data.fs_size, &device.kv_labels());
-                                        fs_free.record(data.fs_free, &device.kv_labels());
-                                    }
-                                    Err(err) => println!("{}", err),
-                                };
-                            })
-                            .await;
+                        match shelly::load(device.url()).await {
+                            Ok(data) => {
+                                uptime.record(data.uptime, &device.kv_labels());
+                                power.record(data.meters[0].power, &device.kv_labels());
+
+                                ram_total.record(data.ram_total, &device.kv_labels());
+                                ram_free.record(data.ram_free, &device.kv_labels());
+                                fs_size.record(data.fs_size, &device.kv_labels());
+                                fs_free.record(data.fs_free, &device.kv_labels());
+                            }
+                            Err(err) => span.record_exception(&*err),
+                        };
                     }
                 })
                 .await;
