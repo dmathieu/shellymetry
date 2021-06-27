@@ -9,6 +9,9 @@ jobs:
           name: Version information
           command: rustc --version; cargo --version; rustup --version
       - run:
+          name: Install APT dependencies
+          command: apt-get update && apt-get install -y cmake build-essential
+      - run:
           name: Calculate dependencies
           command: cargo generate-lockfile
       - restore_cache:
