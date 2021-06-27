@@ -48,7 +48,9 @@ mod tests {
                 .respond_with(status_code(200).body(content)),
         );
 
-        let shelly = load(server.url("/shelly").to_string()).await.unwrap();
+        let shelly = load(Context::current(), server.url("/shelly").to_string())
+            .await
+            .unwrap();
         assert_eq!(343771, shelly.uptime);
         assert_eq!(88.44, shelly.meters[0].power);
         assert_eq!(50616, shelly.ram_total);
