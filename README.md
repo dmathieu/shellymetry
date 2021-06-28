@@ -10,7 +10,7 @@ For now, you need to pull the repository locally, and build it.
 With rust installed:
 
 ```
-cargo build --release
+cargo install shellymetry
 ```
 
 You then need a `shellymetry.json` file with the following content:
@@ -34,3 +34,9 @@ You then need a `shellymetry.json` file with the following content:
 ```
 
 If OTLP isn't configured, traces will be sent to stdout.
+
+Run the process:
+
+```
+shellymetry -c shellymetry.json
+```
