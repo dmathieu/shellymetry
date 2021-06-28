@@ -1,8 +1,12 @@
 [package]
 name = "shellymetry"
+description = "Export shelly.cloud data to Prometheus"
 version = "0.1.0"
 authors = ["dmathieu <damien.mathieu@auth0.com>"]
 edition = "2018"
+repository = "https://github.com/dmathieu/shellymetry"
+readme = "README.md"
+license-file = "LICENSE"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
