@@ -21,7 +21,7 @@ prometheus = "0.12"
 reqwest = { version = "0.11.4", features = ["json"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-tokio = { version = "1.8.0", features = ["full"] }
+tokio = { version = "1.8.1", features = ["full"] }
 
 [dev-dependencies]
 httptest = "0.15.2"
